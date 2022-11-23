@@ -7,8 +7,13 @@ import (
 	"os"
 )
 import cli "github.com/urfave/cli/v2"
+import "golang.org/x/exp/slog"
 
 func main() {
+	loggerOpts := slog.HandlerOptions{
+		AddSource: true,
+	}
+	slog.SetDefault(slog.New(loggerOpts.NewTextHandler(os.Stdout)))
 	r := MainRouter()
 	// see https://cli.urfave.org/v2/getting-started/
 	app := &cli.App{
