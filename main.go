@@ -1,44 +1,46 @@
 package main
 
 import (
-	"flag"
+	"errors"
 	"fmt"
-	"net/http"
-	"time"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/docgen"
-	"github.com/go-chi/render"
+	"log"
+	"os"
 )
+import cli "github.com/urfave/cli/v2"
 
-var routes = flag.Bool("routes", false, "Generate router documentation")
-
-// example see https://github.com/go-chi/chi/blob/master/_examples/rest/main.go
 func main() {
-	flag.Parse()
-	r := chi.NewRouter()
-	// A good base middleware stack
-	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Compress(5))
-	r.Use(middleware.ContentCharset("UTF-8"))
-
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.Timeout(60 * time.Second))
-
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		render.JSON(w, r, "\"welcome\"")
-	})
-	if *routes {
-		// fmt.Println(docgen.JSONRoutesDoc(r))
-		fmt.Println(docgen.MarkdownRoutesDoc(r, docgen.MarkdownOpts{
-			ProjectPath: "github.com/springeye/note-server",
-			Intro:       "Welcome to the note-server generated docs.",
-		}))
-		return
+	r := MainRouter()
+	// see https://cli.urfave.org/v2/getting-started/
+	app := &cli.App{
+		Action: func(context *cli.Context) error {
+			return RunWebServer(r)
+		},
+		Commands: []*cli.Command{
+			{
+				Name:    "start",
+				Aliases: []string{"a"},
+				Usage:   "Run server application in background",
+				Action: func(cCtx *cli.Context) error {
+					return errors.New("feature not implemented")
+				},
+			},
+			{
+				Name:  "doc",
+				Usage: "Generate api documents",
+				Action: func(cCtx *cli.Context) error {
+					fmt.Println(docgen.MarkdownRoutesDoc(r, docgen.MarkdownOpts{
+						ProjectPath: "github.com/springeye/note-server",
+						Intro:       "Welcome to the note-server generated docs.",
+					}))
+					return nil
+				},
+			},
+		},
 	}
 
-	http.ListenAndServe(":3000", r)
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
+
 }
