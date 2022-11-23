@@ -35,7 +35,8 @@ func MainRouter() *chi.Mux {
 	return r
 }
 func RunWebServer(app *chi.Mux) error {
-	db.Connection.DB()
+	user := db.User{}
+	db.Connection.Model(&user).First(&user)
 	slog.Info("http server run: 0.0.0.0:3000")
 	return http.ListenAndServe(":3000", app)
 }
