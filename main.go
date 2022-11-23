@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"github.com/go-chi/docgen"
 	"log"
 	"os"
@@ -29,11 +28,16 @@ func main() {
 				Name:  "doc",
 				Usage: "Generate api documents",
 				Action: func(cCtx *cli.Context) error {
-					fmt.Println(docgen.MarkdownRoutesDoc(r, docgen.MarkdownOpts{
+					markdownRoutesDoc := docgen.MarkdownRoutesDoc(r, docgen.MarkdownOpts{
 						ProjectPath: "github.com/springeye/note-server",
 						Intro:       "Welcome to the note-server generated docs.",
-					}))
-					return nil
+					})
+					println(markdownRoutesDoc)
+					err := os.WriteFile("api.md", []byte(markdownRoutesDoc), 0777)
+					if err != nil {
+						panic(err)
+					}
+					return err
 				},
 			},
 		},
