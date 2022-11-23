@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -17,7 +18,16 @@ var routes = flag.Bool("routes", false, "Generate router documentation")
 func main() {
 	flag.Parse()
 	r := chi.NewRouter()
+	// A good base middleware stack
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
+	r.Use(middleware.Compress(5))
+	r.Use(middleware.ContentCharset("UTF-8"))
+
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.Timeout(60 * time.Second))
+
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, "\"welcome\"")
 	})
