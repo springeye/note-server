@@ -16,7 +16,7 @@ type dbLogger struct {
 func (d *dbLogger) Printf(msg string, args ...interface{}) {
 	slog.Info(msg, args...)
 }
-func init() {
+func Setup() {
 	var err error
 	//Connection, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	//newLogger := logger.New(&dbLogger{}, logger.Config{

@@ -3,17 +3,13 @@ package main
 import (
 	"errors"
 	"github.com/go-chi/docgen"
-	"log"
+	"github.com/springeye/note-server/cmd"
 	"os"
 )
 import cli "github.com/urfave/cli/v2"
-import "golang.org/x/exp/slog"
 
 func main() {
-	loggerOpts := slog.HandlerOptions{
-		AddSource: true,
-	}
-	slog.SetDefault(slog.New(loggerOpts.NewTextHandler(os.Stdout)))
+
 	r := MainRouter()
 	// see https://cli.urfave.org/v2/getting-started/
 	app := &cli.App{
@@ -44,12 +40,45 @@ func main() {
 					}
 					return err
 				},
+			}, {
+				Name:  "user",
+				Usage: "User add/update/delete/disable/enable",
+				Subcommands: []*cli.Command{
+					{
+						Name:  "add",
+						Usage: "Add a user",
+                        HideHelp: true,
+                        UsageText: "note-server user add <username> <password>",
+						Action: func(context *cli.Context) error {
+							return cmd.AddUser(context)
+						},
+					},
+					{
+						Name:  "delete",
+						Usage: "Delete a user",
+                        UsageText: "note-server user delete <username>",
+                        HideHelp: true,
+						Action: func(context *cli.Context) error {
+							return cmd.DeleteUser(context)
+						},
+					},
+                    {
+                        Name:  "password",
+                        Usage: "Set new password for user",
+                        UsageText: "note-server user password <username> <password>",
+                        HideHelp: true,
+                        Action: func(context *cli.Context) error {
+                            return cmd.SetPassword(context)
+                        },
+                    },
+				},
 			},
 		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+        println(err.Error())
+        os.Exit(1)
 	}
 
 }
