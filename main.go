@@ -9,7 +9,6 @@ import (
 import cli "github.com/urfave/cli/v2"
 
 func main() {
-
 	r := MainRouter()
 	// see https://cli.urfave.org/v2/getting-started/
 	app := &cli.App{
@@ -45,40 +44,49 @@ func main() {
 				Usage: "User add/update/delete/disable/enable",
 				Subcommands: []*cli.Command{
 					{
-						Name:  "add",
-						Usage: "Add a user",
-                        HideHelp: true,
-                        UsageText: "note-server user add <username> <password>",
+						Name:      "list",
+						Usage:     "Show user list",
+						HideHelp:  true,
+						UsageText: "note-server user list",
+						Action: func(context *cli.Context) error {
+							return cmd.ListUser(context)
+						},
+					},
+					{
+						Name:      "add",
+						Usage:     "Add a user",
+						HideHelp:  true,
+						UsageText: "note-server user add <username> <password>",
 						Action: func(context *cli.Context) error {
 							return cmd.AddUser(context)
 						},
 					},
 					{
-						Name:  "delete",
-						Usage: "Delete a user",
-                        UsageText: "note-server user delete <username>",
-                        HideHelp: true,
+						Name:      "delete",
+						Usage:     "Delete a user",
+						UsageText: "note-server user delete <username>",
+						HideHelp:  true,
 						Action: func(context *cli.Context) error {
 							return cmd.DeleteUser(context)
 						},
 					},
-                    {
-                        Name:  "password",
-                        Usage: "Set new password for user",
-                        UsageText: "note-server user password <username> <password>",
-                        HideHelp: true,
-                        Action: func(context *cli.Context) error {
-                            return cmd.SetPassword(context)
-                        },
-                    },
+					{
+						Name:      "password",
+						Usage:     "Set new password for user",
+						UsageText: "note-server user password <username> <password>",
+						HideHelp:  true,
+						Action: func(context *cli.Context) error {
+							return cmd.SetPassword(context)
+						},
+					},
 				},
 			},
 		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
-        println(err.Error())
-        os.Exit(1)
+		println(err.Error())
+		os.Exit(1)
 	}
 
 }

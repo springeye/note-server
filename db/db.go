@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	//"gorm.io/driver/sqlite" // 基于 GGO 的 Sqlite 驱动
 	"github.com/glebarez/sqlite" // 纯 Go 实现的 SQLite 驱动, 详情参考： https://github.com/glebarez/sqlite
 	"golang.org/x/exp/slog"
@@ -17,6 +18,9 @@ func (d *dbLogger) Printf(msg string, args ...interface{}) {
 	slog.Info(msg, args...)
 }
 func Setup() {
+	if Connection != nil {
+		return
+	}
 	var err error
 	//Connection, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	//newLogger := logger.New(&dbLogger{}, logger.Config{
@@ -35,5 +39,8 @@ func Setup() {
 	err = Connection.AutoMigrate(&user, &note)
 	if err != nil {
 		panic(err)
+	}
+	for i := 0; i < 3; i++ {
+		Connection.Create(&User{Username: fmt.Sprintf("testuser%d", i)})
 	}
 }

@@ -1,33 +1,35 @@
 package cmd
 
 import (
-    "bufio"
-    "fmt"
+	"bufio"
+	"fmt"
 	"github.com/springeye/note-server/db"
+	"github.com/springeye/note-server/gui"
 	"github.com/urfave/cli/v2"
-    "log"
-    "os"
-    "strings"
+	"log"
+	"os"
+	"strings"
 )
+
 func askForConfirmation(s string) bool {
-    reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(os.Stdin)
 
-    for {
-        fmt.Printf("%s [y/n]: ", s)
+	for {
+		fmt.Printf("%s [y/n]: ", s)
 
-        response, err := reader.ReadString('\n')
-        if err != nil {
-            log.Fatal(err)
-        }
+		response, err := reader.ReadString('\n')
+		if err != nil {
+			log.Fatal(err)
+		}
 
-        response = strings.ToLower(strings.TrimSpace(response))
+		response = strings.ToLower(strings.TrimSpace(response))
 
-        if response == "y" || response == "yes" {
-            return true
-        } else if response == "n" || response == "no" {
-            return false
-        }
-    }
+		if response == "y" || response == "yes" {
+			return true
+		} else if response == "n" || response == "no" {
+			return false
+		}
+	}
 }
 
 func AddUser(c *cli.Context) error {
@@ -46,6 +48,7 @@ func AddUser(c *cli.Context) error {
 	if count > 0 {
 		return cli.Exit(fmt.Sprintf("User %s already exists\n", username), 1)
 	}
+
 	err := db.Connection.Create(&user).Error
 	if err != nil {
 		return cli.Exit(fmt.Sprintf("create user error:%s\n", err.Error()), 1)
@@ -56,16 +59,25 @@ func DeleteUser(c *cli.Context) error {
 	if c.Args().Len() != 1 {
 		cli.ShowSubcommandHelpAndExit(c, 1)
 	}
-    username:=c.Args().Get(0)
-    if askForConfirmation(fmt.Sprintf("Are you sure delete user [%s]",username)){
-        db.Setup()
-        return db.Connection.Where("username = ?",c.Args().Get(0)).Delete(&db.User{}).Error
-    }else{
-        println("cancel")
-    }
+	username := c.Args().Get(0)
+	if askForConfirmation(fmt.Sprintf("Are you sure delete user [%s]", username)) {
+		db.Setup()
+		return db.Connection.Where("username = ?", c.Args().Get(0)).Delete(&db.User{}).Error
+	} else {
+		println("cancel")
+	}
 	return nil
 }
 func SetPassword(c *cli.Context) error {
 
 	return nil
+}
+func ListUser(c *cli.Context) error {
+	var users []db.User
+	defer func() {
+		gui.ShowUserList(users)
+	}()
+	db.Setup()
+
+	return db.Connection.Find(&users).Error
 }
