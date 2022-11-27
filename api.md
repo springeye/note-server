@@ -1,6 +1,6 @@
-# github.com/springeye/note-server
+# github.com/springeye/oplin
 
-Welcome to the note-server generated docs.
+Welcome to the oplin generated docs.
 
 ## Routes
 
@@ -15,8 +15,38 @@ Welcome to the note-server generated docs.
 - [Timeout.func1]()
 - **/**
 	- _GET_
-		- [main.MainRouter.func1]()
+		- [MainRouter.func1]()
+
+</details>
+<details>
+<summary>`/user/login`</summary>
+
+- [RequestID]()
+- [RealIP]()
+- [Logger]()
+- [o-chi/chi/v5/middleware.(*Compressor).Handler-fm]()
+- [Recoverer]()
+- [Timeout.func1]()
+- **/user**
+	- **/login**
+		- _POST_
+			- [userRouter.func1]()
+
+</details>
+<details>
+<summary>`/user/register`</summary>
+
+- [RequestID]()
+- [RealIP]()
+- [Logger]()
+- [o-chi/chi/v5/middleware.(*Compressor).Handler-fm]()
+- [Recoverer]()
+- [Timeout.func1]()
+- **/user**
+	- **/register**
+		- _POST_
+			- [userRouter.func2]()
 
 </details>
 
-Total # of routes: 1
+Total # of routes: 3

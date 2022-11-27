@@ -3,7 +3,7 @@ package gui
 import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-	"github.com/springeye/note-server/db"
+	"github.com/springeye/oplin/db"
 	"os"
 )
 

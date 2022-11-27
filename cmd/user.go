@@ -3,8 +3,8 @@ package cmd
 import (
 	"bufio"
 	"fmt"
-	"github.com/springeye/note-server/db"
-	"github.com/springeye/note-server/gui"
+	"github.com/springeye/oplin/db"
+	"github.com/springeye/oplin/gui"
 	"github.com/urfave/cli/v2"
 	"log"
 	"os"

@@ -2,7 +2,9 @@ package db
 
 import (
 	"fmt"
-	"github.com/springeye/note-server/config"
+	"github.com/springeye/oplin/config"
+	"golang.org/x/exp/slog"
+	"strings"
 	"time"
 
 	//"gorm.io/driver/sqlite" // 基于 GGO 的 Sqlite 驱动
@@ -19,6 +21,7 @@ type dbLogger struct {
 func (d *dbLogger) Printf(msg string, args ...interface{}) {
 	//slog.Info(msg, args...)
 	fmt.Printf(msg, args...)
+	println()
 }
 func Setup() {
 	if Connection != nil {
@@ -32,7 +35,7 @@ func Setup() {
 		IgnoreRecordNotFoundError: true,                   // 忽略ErrRecordNotFound（记录未找到）错误
 		Colorful:                  true,                   // 禁用彩色打印
 	}
-	if config.DefaultConfig.Debug {
+	if config.Default.Debug {
 
 	} else {
 		c.LogLevel = logger.Error
@@ -50,7 +53,19 @@ func Setup() {
 	if err != nil {
 		panic(err)
 	}
-	for i := 0; i < 3; i++ {
-		Connection.Create(&User{Username: fmt.Sprintf("testuser%d", i)})
+	autoCreateUser()
+}
+
+func autoCreateUser() {
+	autoCreateUsers := config.Default.AutoCreateUsers
+	for _, user := range autoCreateUsers {
+		attr := strings.Split(user, ":")
+		username := attr[0]
+		password := attr[1]
+		if Connection.Where(&User{Username: username}).
+			Attrs(&User{Password: password, Salt: "1234"}).
+			FirstOrCreate(&user).Error == nil {
+			slog.Info("auto create user ", username, " success")
+		}
 	}
 }

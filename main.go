@@ -3,17 +3,33 @@ package main
 import (
 	"errors"
 	"github.com/go-chi/docgen"
-	"github.com/springeye/note-server/cmd"
+	"github.com/springeye/oplin/cmd"
+	"github.com/springeye/oplin/config"
+	"github.com/springeye/oplin/server"
 	"os"
 )
 import cli "github.com/urfave/cli/v2"
 
 func main() {
-	r := MainRouter()
+	r := server.MainRouter()
 	// see https://cli.urfave.org/v2/getting-started/
 	app := &cli.App{
 		Action: func(context *cli.Context) error {
-			return RunWebServer(r)
+			return server.RunWebServer(r)
+		},
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "config",
+				Value:       "config.json",
+				Aliases:     []string{"c"},
+				Usage:       "Load app config from `FILE`",
+				EnvVars:     []string{"OPLIN_CONFIG"},
+				DefaultText: "config.json",
+				Action: func(context *cli.Context, s string) error {
+					config.Setup(s)
+					return nil
+				},
+			},
 		},
 		Commands: []*cli.Command{
 			{
@@ -29,8 +45,8 @@ func main() {
 				Usage: "Generate api documents",
 				Action: func(cCtx *cli.Context) error {
 					markdownRoutesDoc := docgen.MarkdownRoutesDoc(r, docgen.MarkdownOpts{
-						ProjectPath: "github.com/springeye/note-server",
-						Intro:       "Welcome to the note-server generated docs.",
+						ProjectPath: "github.com/springeye/oplin",
+						Intro:       "Welcome to the oplin generated docs.",
 					})
 					println(markdownRoutesDoc)
 					err := os.WriteFile("api.md", []byte(markdownRoutesDoc), 0777)
@@ -47,7 +63,7 @@ func main() {
 						Name:      "list",
 						Usage:     "Show user list",
 						HideHelp:  true,
-						UsageText: "note-server user list",
+						UsageText: "oplin user list",
 						Action: func(context *cli.Context) error {
 							return cmd.ListUser(context)
 						},
@@ -56,7 +72,7 @@ func main() {
 						Name:      "add",
 						Usage:     "Add a user",
 						HideHelp:  true,
-						UsageText: "note-server user add <username> <password>",
+						UsageText: "oplin user add <username> <password>",
 						Action: func(context *cli.Context) error {
 							return cmd.AddUser(context)
 						},
@@ -64,7 +80,7 @@ func main() {
 					{
 						Name:      "delete",
 						Usage:     "Delete a user",
-						UsageText: "note-server user delete <username>",
+						UsageText: "oplin user delete <username>",
 						HideHelp:  true,
 						Action: func(context *cli.Context) error {
 							return cmd.DeleteUser(context)
@@ -73,7 +89,7 @@ func main() {
 					{
 						Name:      "password",
 						Usage:     "Set new password for user",
-						UsageText: "note-server user password <username> <password>",
+						UsageText: "oplin user password <username> <password>",
 						HideHelp:  true,
 						Action: func(context *cli.Context) error {
 							return cmd.SetPassword(context)

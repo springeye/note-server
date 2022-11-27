@@ -1,7 +1,8 @@
-package main
+package server
 
 import (
-	"github.com/springeye/note-server/db"
+	"fmt"
+	"github.com/springeye/oplin/db"
 	"golang.org/x/exp/slog"
 	"net/http"
 	"os"
@@ -11,7 +12,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 )
-import "github.com/springeye/note-server/config"
+import "github.com/springeye/oplin/config"
 
 type H map[string]interface{}
 
@@ -33,22 +34,24 @@ func MainRouter() *chi.Mux {
 			"name": "springeye",
 		})
 	})
+	r.Mount("/user", userRouter())
 
 	return r
 }
+
 func RunWebServer(app *chi.Mux) error {
 	loggerOpts := slog.HandlerOptions{
 		AddSource: true,
 	}
-	if config.DefaultConfig.Debug {
+	if config.Default.Debug {
 		loggerOpts.Level = slog.DebugLevel
 	} else {
 		loggerOpts.Level = slog.ErrorLevel
 	}
 	slog.SetDefault(slog.New(loggerOpts.NewTextHandler(os.Stdout)))
 	db.Setup()
-	user := db.User{}
-	db.Connection.Model(&user)
-	println("http server run: 0.0.0.0:3000")
-	return http.ListenAndServe(":3000", app)
+
+	port := config.Default.Port
+	println("http server run: 0.0.0.0:", port)
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), app)
 }
