@@ -27,10 +27,10 @@ func Setup() {
 	var err error
 	//Connection, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	c := logger.Config{
-		SlowThreshold:             time.Second, // 慢 SQL 阈值
-		LogLevel:                  logger.Info, // 日志级别
-		IgnoreRecordNotFoundError: true,        // 忽略ErrRecordNotFound（记录未找到）错误
-		Colorful:                  true,        // 禁用彩色打印
+		SlowThreshold:             200 * time.Millisecond, // 慢 SQL 阈值
+		LogLevel:                  logger.Info,            // 日志级别
+		IgnoreRecordNotFoundError: true,                   // 忽略ErrRecordNotFound（记录未找到）错误
+		Colorful:                  true,                   // 禁用彩色打印
 	}
 	if config.DefaultConfig.Debug {
 
