@@ -4,13 +4,14 @@ import (
 	"github.com/springeye/note-server/db"
 	"golang.org/x/exp/slog"
 	"net/http"
-    "os"
-    "time"
+	"os"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 )
+import "github.com/springeye/note-server/config"
 
 type H map[string]interface{}
 
@@ -36,13 +37,18 @@ func MainRouter() *chi.Mux {
 	return r
 }
 func RunWebServer(app *chi.Mux) error {
-    loggerOpts := slog.HandlerOptions{
-        AddSource: true,
-        }
-        slog.SetDefault(slog.New(loggerOpts.NewTextHandler(os.Stdout)))
-    db.Setup()
+	loggerOpts := slog.HandlerOptions{
+		AddSource: true,
+	}
+	if config.DefaultConfig.Debug {
+		loggerOpts.Level = slog.DebugLevel
+	} else {
+		loggerOpts.Level = slog.ErrorLevel
+	}
+	slog.SetDefault(slog.New(loggerOpts.NewTextHandler(os.Stdout)))
+	db.Setup()
 	user := db.User{}
 	db.Connection.Model(&user)
-	slog.Info("http server run: 0.0.0.0:3000")
+	println("http server run: 0.0.0.0:3000")
 	return http.ListenAndServe(":3000", app)
 }
