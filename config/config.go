@@ -34,11 +34,7 @@ func Setup(config string) {
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
-	for _, k := range viper.AllKeys() {
-		println(k, "==>", viper.Get(k))
-	}
 	if err := viper.Unmarshal(Default); err != nil {
 		panic(err)
 	}
-	//Default.Debug = viper.GetBool("app.debug")
 }

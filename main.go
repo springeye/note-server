@@ -14,7 +14,12 @@ func main() {
 	r := server.MainRouter()
 	// see https://cli.urfave.org/v2/getting-started/
 	app := &cli.App{
+		EnableBashCompletion: true,
+		Suggest:              true,
 		Action: func(context *cli.Context) error {
+			if context.NArg() > 0 {
+				return errors.New("args error")
+			}
 			return server.RunWebServer(r)
 		},
 		Flags: []cli.Flag{

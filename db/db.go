@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/springeye/oplin/config"
 	"golang.org/x/exp/slog"
 	"strings"
@@ -58,14 +59,16 @@ func Setup() {
 
 func autoCreateUser() {
 	autoCreateUsers := config.Default.AutoCreateUsers
-	for _, user := range autoCreateUsers {
-		attr := strings.Split(user, ":")
+	for _, text := range autoCreateUsers {
+		attr := strings.Split(text, ":")
 		username := attr[0]
 		password := attr[1]
-		if Connection.Where(&User{Username: username}).
-			Attrs(&User{Password: password, Salt: "1234"}).
+		var user User
+		salt := uuid.NewString()
+		if Connection.Where(User{Username: username}).
+			Attrs(User{Password: CalculatePassword(password, salt), Salt: salt}).
 			FirstOrCreate(&user).Error == nil {
-			slog.Info("auto create user ", username, " success")
+			slog.Info("auto create user success", "username", username)
 		}
 	}
 }
