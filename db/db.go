@@ -14,9 +14,13 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-var Connection *gorm.DB
 
+type DBStore struct {
+	conf *config.AppConfig
+	Connection *gorm.DB
+}
 type dbLogger struct {
+
 }
 
 func (d *dbLogger) Printf(msg string, args ...interface{}) {
@@ -24,10 +28,8 @@ func (d *dbLogger) Printf(msg string, args ...interface{}) {
 	fmt.Printf(msg, args...)
 	println()
 }
-func Setup() {
-	if Connection != nil {
-		return
-	}
+func (s *DBStore)Setup() {
+
 	var err error
 	//Connection, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	c := logger.Config{
@@ -36,7 +38,7 @@ func Setup() {
 		IgnoreRecordNotFoundError: true,                   // 忽略ErrRecordNotFound（记录未找到）错误
 		Colorful:                  true,                   // 禁用彩色打印
 	}
-	if config.Default.Debug {
+	if s.conf.Debug {
 
 	} else {
 		c.LogLevel = logger.Error
@@ -44,28 +46,28 @@ func Setup() {
 	newLogger := logger.New(&dbLogger{}, c)
 
 	config := gorm.Config{Logger: newLogger}
-	Connection, err = gorm.Open(sqlite.Open(":memory:?_pragma=foreign_keys(1)"), &config)
+	s.Connection, err = gorm.Open(sqlite.Open(":memory:?_pragma=foreign_keys(1)"), &config)
 	if err != nil {
 		panic(err)
 	}
 	user := User{}
 	note := Note{}
-	err = Connection.AutoMigrate(&user, &note)
+	err = s.Connection.AutoMigrate(&user, &note)
 	if err != nil {
 		panic(err)
 	}
-	autoCreateUser()
+	s.autoCreateUser()
 }
 
-func autoCreateUser() {
-	autoCreateUsers := config.Default.AutoCreateUsers
+func (s *DBStore)autoCreateUser() {
+	autoCreateUsers := s.conf.AutoCreateUsers
 	for _, text := range autoCreateUsers {
 		attr := strings.Split(text, ":")
 		username := attr[0]
 		password := attr[1]
 		var user User
 		salt := uuid.NewString()
-		if Connection.Where(User{Username: username}).
+		if s.Connection.Where(User{Username: username}).
 			Attrs(User{Password: CalculatePassword(password, salt), Salt: salt}).
 			FirstOrCreate(&user).Error == nil {
 			slog.Info("auto create user success", "username", username)

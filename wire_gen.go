@@ -10,6 +10,7 @@ package main
 
 func InitApplication() *application {
 	router := providerRouter()
-	mainApplication := providerApplication(router)
+	appConfig := providerAppConfig()
+	mainApplication := providerApplication(router, appConfig)
 	return mainApplication
 }

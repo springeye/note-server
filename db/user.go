@@ -23,10 +23,10 @@ func md5V(str string) string {
 func CalculatePassword(password, salt string) string {
 	return strings.ToLower(md5V(fmt.Sprintf("%s:%s", password, salt)))
 }
-func CheckUser(username string) bool {
-	err := Connection.Where("username  = ?", username).Row().Err()
+func CheckUser(db *gorm.DB,username string) bool {
+	err := db.Where("username  = ?", username).Row().Err()
 	return err == gorm.ErrRecordNotFound
 }
-func CreateUser(username, password string) error {
-	return Connection.Create(&User{Username: username, Password: password}).Error
+func CreateUser(db *gorm.DB,username, password string) error {
+	return db.Create(&User{Username: username, Password: password}).Error
 }

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	httpSwagger "github.com/swaggo/http-swagger"
 	_ "golang.org/x/exp/slog"
 	"net/http"
@@ -12,7 +11,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 )
-import "github.com/springeye/oplin/config"
 import _ "github.com/springeye/oplin/docs"
 
 type H map[string]interface{}
@@ -42,11 +40,4 @@ func MainRouter() *chi.Mux {
 	r.Mount("/user", userRouter())
 
 	return r
-}
-
-func RunWebServer(root chi.Router) error {
-
-	port := config.Default.Port
-	println("http server run: 0.0.0.0:", port)
-	return http.ListenAndServe(fmt.Sprintf(":%d", port), root)
 }

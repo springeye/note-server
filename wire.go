@@ -8,5 +8,5 @@ import (
 )
 
 func InitApplication() *application {
-	panic(wire.Build(providerRouter, providerApplication))
+	panic(wire.Build(providerRouter,providerAppConfig, providerApplication))
 }

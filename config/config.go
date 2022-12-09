@@ -12,12 +12,7 @@ type AppConfig struct {
 	AutoCreateUsers []string `json:"auto_create_users" mapstructure:"auto_create_users"`
 }
 
-var Default *AppConfig
 
-func init() {
-	Default = &AppConfig{}
-	Setup("config.json")
-}
 
 type flagBind struct {
 }
@@ -34,7 +29,5 @@ func Setup(config string) {
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
-	if err := viper.Unmarshal(Default); err != nil {
-		panic(err)
-	}
+
 }

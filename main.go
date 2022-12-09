@@ -2,33 +2,37 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/docgen"
 	"github.com/springeye/oplin/cmd"
 	"github.com/springeye/oplin/config"
 	"github.com/springeye/oplin/db"
-	"github.com/springeye/oplin/server"
 	"golang.org/x/exp/slog"
 	"gorm.io/gorm"
+	"net/http"
 	"os"
 )
 import cli "github.com/urfave/cli/v2"
 
 type application struct {
 	mainRouter chi.Router
+	conf *config.AppConfig
 }
 type command struct {
 	db *gorm.DB
 }
 
 func (receiver *application) start() error {
-	return server.RunWebServer(receiver.mainRouter)
+	port := receiver.conf.Port
+	println("http server run: 0.0.0.0:", port)
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), receiver.mainRouter)
 }
 func (receiver *application) init() error {
 	loggerOpts := slog.HandlerOptions{
 		AddSource: true,
 	}
-	if config.Default.Debug {
+	if receiver.conf.Debug {
 		loggerOpts.Level = slog.DebugLevel
 	} else {
 		loggerOpts.Level = slog.ErrorLevel
