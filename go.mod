@@ -9,6 +9,7 @@ require (
 	github.com/go-chi/jwtauth/v5 v5.1.0
 	github.com/go-chi/render v1.0.2
 	github.com/google/uuid v1.3.0
+	github.com/google/wire v0.5.0
 	github.com/jedib0t/go-pretty/v6 v6.4.2
 	github.com/spf13/viper v1.14.0
 	github.com/swaggo/http-swagger v1.3.3

@@ -42,7 +42,6 @@ func AddUser(c *cli.Context) error {
 		Username: username,
 		Password: password,
 	}
-	db.Setup()
 	var count int64
 	db.Connection.Model(&user).Where("username = ?", username).Count(&count)
 	if count > 0 {
@@ -61,7 +60,6 @@ func DeleteUser(c *cli.Context) error {
 	}
 	username := c.Args().Get(0)
 	if askForConfirmation(fmt.Sprintf("Are you sure delete user [%s]", username)) {
-		db.Setup()
 		return db.Connection.Where("username = ?", c.Args().Get(0)).Delete(&db.User{}).Error
 	} else {
 		println("cancel")
@@ -77,7 +75,6 @@ func ListUser(c *cli.Context) error {
 	defer func() {
 		gui.ShowUserList(users)
 	}()
-	db.Setup()
 
 	return db.Connection.Find(&users).Error
 }

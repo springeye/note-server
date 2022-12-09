@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"github.com/go-chi/chi/v5"
 	jwtauth "github.com/go-chi/jwtauth/v5"
 	"github.com/go-chi/render"
@@ -87,7 +86,7 @@ func userRouter() http.Handler {
 // @Security     BearerAuth
 func info(writer http.ResponseWriter, r *http.Request) {
 	_, claims, _ := jwtauth.FromContext(r.Context())
-	httputil.NewResult[string](writer, r, fmt.Sprintf("您的名字是.  %v", claims["username"]))
+	httputil.NewResult[map[string]interface{}](writer, r, claims)
 }
 
 // @Summary      注册

@@ -2,11 +2,10 @@ package server
 
 import (
 	"fmt"
-	"github.com/springeye/oplin/db"
 	httpSwagger "github.com/swaggo/http-swagger"
-	"golang.org/x/exp/slog"
+	_ "golang.org/x/exp/slog"
 	"net/http"
-	"os"
+	_ "os"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -45,19 +44,9 @@ func MainRouter() *chi.Mux {
 	return r
 }
 
-func RunWebServer(app *chi.Mux) error {
-	loggerOpts := slog.HandlerOptions{
-		AddSource: true,
-	}
-	if config.Default.Debug {
-		loggerOpts.Level = slog.DebugLevel
-	} else {
-		loggerOpts.Level = slog.ErrorLevel
-	}
-	slog.SetDefault(slog.New(loggerOpts.NewTextHandler(os.Stdout)))
-	db.Setup()
+func RunWebServer(root chi.Router) error {
 
 	port := config.Default.Port
 	println("http server run: 0.0.0.0:", port)
-	return http.ListenAndServe(fmt.Sprintf(":%d", port), app)
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), root)
 }
