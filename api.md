@@ -19,6 +19,20 @@ Welcome to the oplin generated docs.
 
 </details>
 <details>
+<summary>`/swagger`</summary>
+
+- [RequestID]()
+- [RealIP]()
+- [Logger]()
+- [o-chi/chi/v5/middleware.(*Compressor).Handler-fm]()
+- [Recoverer]()
+- [Timeout.func1]()
+- **/swagger**
+	- _*_
+		- [v5.(*Mux).Mount.func1]()
+
+</details>
+<details>
 <summary>`/user/info`</summary>
 
 - [RequestID]()
@@ -28,11 +42,11 @@ Welcome to the oplin generated docs.
 - [Recoverer]()
 - [Timeout.func1]()
 - **/user**
-	- [v5.Verify.func1]()
-	- [v5.Authenticator]()
 	- **/info**
 		- _GET_
-			- [userRouter.func3]()
+			- [v5.Verify.func1]()
+			- [v5.Authenticator]()
+			- [userRouter.func3.1]()
 
 </details>
 <details>
@@ -45,8 +59,6 @@ Welcome to the oplin generated docs.
 - [Recoverer]()
 - [Timeout.func1]()
 - **/user**
-	- [v5.Verify.func1]()
-	- [v5.Authenticator]()
 	- **/login**
 		- _POST_
 			- [userRouter.func1]()
@@ -62,12 +74,10 @@ Welcome to the oplin generated docs.
 - [Recoverer]()
 - [Timeout.func1]()
 - **/user**
-	- [v5.Verify.func1]()
-	- [v5.Authenticator]()
 	- **/register**
 		- _POST_
 			- [userRouter.func2]()
 
 </details>
 
-Total # of routes: 4
+Total # of routes: 5

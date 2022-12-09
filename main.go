@@ -10,6 +10,25 @@ import (
 )
 import cli "github.com/urfave/cli/v2"
 
+// @title           Note Server API
+// @version         1.0
+// @description     Note Server API
+// @termsOfService  https://github.com/springeye
+
+// @contact.name   API Support
+// @contact.url    https://github.com/springeye/note-server
+// @contact.email  henjue@gmail.com
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+// // @host petstore.swagger.io
+// @BasePath      /
+
+// @securityDefinitions.apikey  BearerAuth
+// @in                          header
+// @name                        Authorization
+// @description                 Description for what is this security definition being used
+
 func main() {
 	r := server.MainRouter()
 	// see https://cli.urfave.org/v2/getting-started/

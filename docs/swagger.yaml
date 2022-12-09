@@ -1,0 +1,159 @@
+basePath: /
+definitions:
+  db.User:
+    properties:
+      createdAt:
+        type: integer
+      deletedAt:
+        type: integer
+      id:
+        type: integer
+      password:
+        type: string
+      salt:
+        type: string
+      updatedAt:
+        type: integer
+      username:
+        type: string
+      usn:
+        type: integer
+    type: object
+  httputil.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
+  model.Login:
+    properties:
+      password:
+        example: admin
+        type: string
+      username:
+        example: admin
+        type: string
+    type: object
+  model.Register:
+    properties:
+      password:
+        example: admin
+        type: string
+      username:
+        example: admin
+        type: string
+    type: object
+info:
+  contact:
+    email: henjue@gmail.com
+    name: API Support
+    url: https://github.com/springeye/note-server
+  description: Note Server API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://github.com/springeye
+  title: Note Server API
+  version: "1.0"
+paths:
+  /user/info:
+    get:
+      consumes:
+      - application/json
+      description: 用户信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: 用户信息
+      tags:
+      - 用户
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: 用户登录
+      parameters:
+      - description: login by  user account
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.Login'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: 登录
+      tags:
+      - 用户
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: 用户注册
+      parameters:
+      - description: register user account
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.Register'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: 注册
+      tags:
+      - 用户
+securityDefinitions:
+  BearerAuth:
+    description: Description for what is this security definition being used
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
