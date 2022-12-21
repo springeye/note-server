@@ -1,43 +1,33 @@
 package server
 
 import (
-	httpSwagger "github.com/swaggo/http-swagger"
-	_ "golang.org/x/exp/slog"
-	"net/http"
-	_ "os"
-	"time"
-
+	"fmt"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/render"
+	"github.com/go-chi/docgen"
+	"github.com/springeye/oplin/db"
+	"golang.org/x/exp/slog"
+	"net/http"
+	"os"
 )
-import _ "github.com/springeye/oplin/docs"
 
-type H map[string]interface{}
+type Server struct {
+	router chi.Router
+	store  *db.Store
+}
 
-// example see https://github.com/go-chi/chi/blob/master/_examples/rest/main.go
-func MainRouter() *chi.Mux {
-
-	r := chi.NewRouter()
-	// A good base middleware stack
-	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Compress(5))
-
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.Timeout(60 * time.Second))
-
-	r.Get("/swagger/*", httpSwagger.Handler(
-	//httpSwagger.URL("http://localhost:1323/swagger/doc.json"), //The url pointing to API definition
-	))
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		render.JSON(w, r, H{
-			"code": 0,
-			"name": "springeye",
-		})
+func NewServer(store *db.Store) *Server {
+	return &Server{router: mainRouter(store), store: store}
+}
+func (s *Server) Start(port int) error {
+	slog.Info(fmt.Sprintf("http server run: 0.0.0.0:%d", port))
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), s.router)
+}
+func (s *Server) GenDoc() error {
+	markdownRoutesDoc := docgen.MarkdownRoutesDoc(s.router, docgen.MarkdownOpts{
+		ProjectPath: "github.com/springeye/oplin",
+		Intro:       "Welcome to the oplin generated docs.",
 	})
-	r.Mount("/user", userRouter())
-
-	return r
+	println(markdownRoutesDoc)
+	err := os.WriteFile("api.md", []byte(markdownRoutesDoc), 0777)
+	return err
 }

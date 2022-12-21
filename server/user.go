@@ -11,6 +11,10 @@ import (
 	"net/http"
 )
 
+type User struct {
+	store *db.Store
+}
+
 var tokenAuth = jwtauth.New("HS256", []byte("secret"), nil) // replace with secret key
 // @Summary      登录
 // @Description  用户登录
@@ -23,7 +27,7 @@ var tokenAuth = jwtauth.New("HS256", []byte("secret"), nil) // replace with secr
 // @Failure      500  {object}  httputil.HTTPError
 //
 // @Router       /user/login [post]
-func login(w http.ResponseWriter, r *http.Request) {
+func (u *User) login(w http.ResponseWriter, r *http.Request) {
 	var inputUser db.User
 	if err := render.DecodeJSON(r.Body, &inputUser); err != nil {
 		render.JSON(w, r, H{
@@ -33,7 +37,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var outUser db.User
-	if err := db.Connection.Find(&outUser, "username = ?", inputUser.Username).Error; err != nil {
+	if err := u.store.Connection.Find(&outUser, "username = ?", inputUser.Username).Error; err != nil {
 		render.JSON(w, r, H{
 			"code": 20001,
 			"msg":  err.Error(),
@@ -57,12 +61,12 @@ func login(w http.ResponseWriter, r *http.Request) {
 		"data": tokenString,
 	})
 }
-func userRouter() http.Handler {
+func userRouter(user *User) http.Handler {
 
 	r := chi.NewRouter()
 
-	r.Post("/login", login)
-	r.Post("/register", register)
+	r.Post("/login", user.login)
+	r.Post("/register", user.register)
 	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
 		r.Use(jwtauth.Authenticator)
@@ -101,13 +105,13 @@ func info(writer http.ResponseWriter, r *http.Request) {
 // @Failure      500   {object}  httputil.HTTPError
 //
 // @Router       /user/register [post]
-func register(writer http.ResponseWriter, request *http.Request) {
+func (u *User) register(writer http.ResponseWriter, request *http.Request) {
 	var req model.Register
 	if err := render.DecodeJSON(request.Body, &req); err != nil {
 		httputil.NewError(writer, request, 400, err)
 		return
 	}
-	if db.CheckUser(req.Username) {
+	if db.CheckUser(u.store.Connection, req.Username) {
 		render.JSON(writer, request, H{
 			"code": 10001,
 			"msg":  "user already",
@@ -118,7 +122,7 @@ func register(writer http.ResponseWriter, request *http.Request) {
 		user.Username = req.Username
 		user.Salt = uuid.NewString()
 		user.Password = db.CalculatePassword(req.Password, user.Salt)
-		if err := db.Connection.Create(&user).Error; err != nil {
+		if err := u.store.Connection.Create(&user).Error; err != nil {
 			render.JSON(writer, request, H{
 				"code": 20001,
 				"msg":  err.Error(),

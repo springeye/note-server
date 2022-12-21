@@ -9,8 +9,10 @@ package main
 // Injectors from wire.go:
 
 func InitApplication() *application {
-	router := providerRouter()
 	appConfig := providerAppConfig()
-	mainApplication := providerApplication(router, appConfig)
+	store := providerStore(appConfig)
+	cmdCommand := providerCommand(store)
+	server := providerServer(store)
+	mainApplication := providerApplication(appConfig, store, cmdCommand, server)
 	return mainApplication
 }

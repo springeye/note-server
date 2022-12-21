@@ -1,24 +1,37 @@
 package main
 
 import (
-	"github.com/go-chi/chi/v5"
 	"github.com/spf13/viper"
+	"github.com/springeye/oplin/cmd"
 	"github.com/springeye/oplin/config"
+	"github.com/springeye/oplin/db"
 	"github.com/springeye/oplin/server"
 )
 
-func providerApplication(mainRouter chi.Router,conf *config.AppConfig) *application {
+func providerApplication(conf *config.AppConfig, store *db.Store, c *cmd.Command, s *server.Server) *application {
 	return &application{
-		mainRouter: mainRouter,
-		conf: conf,
+		conf:   conf,
+		store:  store,
+		cmd:    c,
+		server: s,
 	}
-}
-func providerRouter() chi.Router {
-	return server.MainRouter()
 }
 func providerAppConfig() *config.AppConfig {
 	config.Setup("config.json")
 	var conf config.AppConfig
-	viper.Unmarshal(conf)
+	err := viper.Unmarshal(&conf)
+	if err != nil {
+		panic(err)
+	}
 	return &conf
+}
+func providerStore(appConfig *config.AppConfig) *db.Store {
+	dbStore := db.Store{Conf: appConfig}
+	return &dbStore
+}
+func providerCommand(store *db.Store) *cmd.Command {
+	return cmd.NewCommand(store)
+}
+func providerServer(store *db.Store) *server.Server {
+	return server.NewServer(store)
 }

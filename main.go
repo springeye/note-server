@@ -2,47 +2,10 @@ package main
 
 import (
 	"errors"
-	"fmt"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/docgen"
-	"github.com/springeye/oplin/cmd"
 	"github.com/springeye/oplin/config"
-	"github.com/springeye/oplin/db"
-	"golang.org/x/exp/slog"
-	"gorm.io/gorm"
-	"net/http"
 	"os"
 )
 import cli "github.com/urfave/cli/v2"
-
-type application struct {
-	mainRouter chi.Router
-	conf *config.AppConfig
-}
-type command struct {
-	db *gorm.DB
-}
-
-func (receiver *application) start() error {
-	port := receiver.conf.Port
-	println("http server run: 0.0.0.0:", port)
-	return http.ListenAndServe(fmt.Sprintf(":%d", port), receiver.mainRouter)
-}
-func (receiver *application) init() error {
-	loggerOpts := slog.HandlerOptions{
-		AddSource: true,
-	}
-	if receiver.conf.Debug {
-		loggerOpts.Level = slog.DebugLevel
-	} else {
-		loggerOpts.Level = slog.ErrorLevel
-	}
-	slog.SetDefault(slog.New(loggerOpts.NewTextHandler(os.Stdout)))
-
-	slog.Debug("init database")
-	db.Setup()
-	return nil
-}
 
 // @title           Note Server API
 // @version         1.0
@@ -106,16 +69,7 @@ func main() {
 				Name:  "doc",
 				Usage: "Generate api documents",
 				Action: func(cCtx *cli.Context) error {
-					markdownRoutesDoc := docgen.MarkdownRoutesDoc(application.mainRouter, docgen.MarkdownOpts{
-						ProjectPath: "github.com/springeye/oplin",
-						Intro:       "Welcome to the oplin generated docs.",
-					})
-					println(markdownRoutesDoc)
-					err := os.WriteFile("api.md", []byte(markdownRoutesDoc), 0777)
-					if err != nil {
-						panic(err)
-					}
-					return err
+					return application.server.GenDoc()
 				},
 			}, {
 				Name:  "user",
@@ -128,7 +82,7 @@ func main() {
 						HideHelp:  true,
 						UsageText: "oplin user list",
 						Action: func(context *cli.Context) error {
-							return cmd.ListUser(context)
+							return application.cmd.ListUser(context)
 						},
 					},
 					{
@@ -137,7 +91,7 @@ func main() {
 						HideHelp:  true,
 						UsageText: "oplin user add <username> <password>",
 						Action: func(context *cli.Context) error {
-							return cmd.AddUser(context)
+							return application.cmd.AddUser(context)
 						},
 					},
 					{
@@ -146,7 +100,7 @@ func main() {
 						UsageText: "oplin user delete <username>",
 						HideHelp:  true,
 						Action: func(context *cli.Context) error {
-							return cmd.DeleteUser(context)
+							return application.cmd.DeleteUser(context)
 						},
 					},
 					{
@@ -155,7 +109,7 @@ func main() {
 						UsageText: "oplin user password <username> <password>",
 						HideHelp:  true,
 						Action: func(context *cli.Context) error {
-							return cmd.SetPassword(context)
+							return application.cmd.SetPassword(context)
 						},
 					},
 				},

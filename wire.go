@@ -8,5 +8,10 @@ import (
 )
 
 func InitApplication() *application {
-	panic(wire.Build(providerRouter,providerAppConfig, providerApplication))
+	panic(wire.Build(
+		providerAppConfig,
+		providerStore,
+		providerCommand,
+		providerServer,
+		providerApplication))
 }

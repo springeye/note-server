@@ -14,13 +14,11 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-
-type DBStore struct {
-	conf *config.AppConfig
+type Store struct {
+	Conf       *config.AppConfig
 	Connection *gorm.DB
 }
 type dbLogger struct {
-
 }
 
 func (d *dbLogger) Printf(msg string, args ...interface{}) {
@@ -28,7 +26,7 @@ func (d *dbLogger) Printf(msg string, args ...interface{}) {
 	fmt.Printf(msg, args...)
 	println()
 }
-func (s *DBStore)Setup() {
+func (s *Store) Setup() {
 
 	var err error
 	//Connection, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
@@ -38,7 +36,7 @@ func (s *DBStore)Setup() {
 		IgnoreRecordNotFoundError: true,                   // 忽略ErrRecordNotFound（记录未找到）错误
 		Colorful:                  true,                   // 禁用彩色打印
 	}
-	if s.conf.Debug {
+	if s.Conf.Debug {
 
 	} else {
 		c.LogLevel = logger.Error
@@ -59,8 +57,8 @@ func (s *DBStore)Setup() {
 	s.autoCreateUser()
 }
 
-func (s *DBStore)autoCreateUser() {
-	autoCreateUsers := s.conf.AutoCreateUsers
+func (s *Store) autoCreateUser() {
+	autoCreateUsers := s.Conf.AutoCreateUsers
 	for _, text := range autoCreateUsers {
 		attr := strings.Split(text, ":")
 		username := attr[0]

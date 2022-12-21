@@ -32,7 +32,7 @@ func askForConfirmation(s string) bool {
 	}
 }
 
-func AddUser(c *cli.Context) error {
+func (cmd *Command) AddUser(c *cli.Context) error {
 	if c.Args().Len() != 2 {
 		cli.ShowSubcommandHelpAndExit(c, 1)
 	}
@@ -43,38 +43,38 @@ func AddUser(c *cli.Context) error {
 		Password: password,
 	}
 	var count int64
-	db.Connection.Model(&user).Where("username = ?", username).Count(&count)
+	cmd.store.Connection.Model(&user).Where("username = ?", username).Count(&count)
 	if count > 0 {
 		return cli.Exit(fmt.Sprintf("User %s already exists\n", username), 1)
 	}
 
-	err := db.Connection.Create(&user).Error
+	err := cmd.store.Connection.Create(&user).Error
 	if err != nil {
 		return cli.Exit(fmt.Sprintf("create user error:%s\n", err.Error()), 1)
 	}
 	return nil
 }
-func DeleteUser(c *cli.Context) error {
+func (cmd *Command) DeleteUser(c *cli.Context) error {
 	if c.Args().Len() != 1 {
 		cli.ShowSubcommandHelpAndExit(c, 1)
 	}
 	username := c.Args().Get(0)
 	if askForConfirmation(fmt.Sprintf("Are you sure delete user [%s]", username)) {
-		return db.Connection.Where("username = ?", c.Args().Get(0)).Delete(&db.User{}).Error
+		return cmd.store.Connection.Where("username = ?", c.Args().Get(0)).Delete(&db.User{}).Error
 	} else {
 		println("cancel")
 	}
 	return nil
 }
-func SetPassword(c *cli.Context) error {
+func (cmd *Command) SetPassword(c *cli.Context) error {
 
 	return nil
 }
-func ListUser(c *cli.Context) error {
+func (cmd *Command) ListUser(c *cli.Context) error {
 	var users []db.User
 	defer func() {
 		gui.ShowUserList(users)
 	}()
 
-	return db.Connection.Find(&users).Error
+	return cmd.store.Connection.Find(&users).Error
 }
