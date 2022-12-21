@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"github.com/springeye/oplin/config"
 	"os"
 )
 import cli "github.com/urfave/cli/v2"
@@ -50,8 +49,7 @@ func main() {
 				EnvVars:     []string{"OPLIN_CONFIG"},
 				DefaultText: "config.json",
 				Action: func(context *cli.Context, s string) error {
-					config.Setup(s)
-					return nil
+					return application.conf.ReInit(s)
 				},
 			},
 		},

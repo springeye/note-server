@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/spf13/viper"
 	"github.com/springeye/oplin/cmd"
 	"github.com/springeye/oplin/config"
 	"github.com/springeye/oplin/db"
@@ -17,17 +16,11 @@ func providerApplication(conf *config.AppConfig, store *db.Store, c *cmd.Command
 	}
 }
 func providerAppConfig() *config.AppConfig {
-	config.Setup("config.json")
-	var conf config.AppConfig
-	err := viper.Unmarshal(&conf)
-	if err != nil {
-		panic(err)
-	}
-	return &conf
+	conf:=config.NewConfig()
+	return conf
 }
 func providerStore(appConfig *config.AppConfig) *db.Store {
-	dbStore := db.Store{Conf: appConfig}
-	return &dbStore
+	return db.NewStore(appConfig)
 }
 func providerCommand(store *db.Store) *cmd.Command {
 	return cmd.NewCommand(store)

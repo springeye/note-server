@@ -15,8 +15,11 @@ import (
 )
 
 type Store struct {
-	Conf       *config.AppConfig
 	Connection *gorm.DB
+	Conf       *config.AppConfig
+}
+func NewStore(conf *config.AppConfig)*Store{
+		return &Store{Conf: conf}
 }
 type dbLogger struct {
 }

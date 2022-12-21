@@ -12,12 +12,24 @@ type AppConfig struct {
 	AutoCreateUsers []string `json:"auto_create_users" mapstructure:"auto_create_users"`
 }
 
-
-
-type flagBind struct {
+func (receiver *AppConfig) ReInit(name string) error  {
+	setup(name)
+	err := viper.Unmarshal(receiver)
+	return err
+}
+func NewConfig() *AppConfig {
+	setup("config.json")
+	var conf AppConfig
+	err := viper.Unmarshal(&conf)
+	if err != nil {
+		panic(err)
+	}
+	return &conf
 }
 
-func Setup(config string) {
+
+
+func setup(config string) {
 	extension := filepath.Ext(config)
 	var name = config[0 : len(config)-len(extension)]
 	viper.SetConfigName(name)           // name of config file (without extension)
